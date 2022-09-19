@@ -1,0 +1,24 @@
+footer{
+    position:inherit;
+    bottom:0px;
+    font-size: 0.3em;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+body{
+    background-color:bisque;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+}
+
+#score {
+    
+ background-color: white;
+}
+
+#problem{
+    min-height: 50%;
+    background-color: white;
+
+    
+}
+
