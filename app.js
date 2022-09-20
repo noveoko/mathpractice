@@ -58,7 +58,7 @@ function increase_score(v=1){
     config.score += v
 }
 
-function load_question(){
+async function load_question(){
     config.no_submit=false;
     console.log("Next question...")
     let target = document.querySelector("#problem")
@@ -66,7 +66,7 @@ function load_question(){
     answer_set()
     guess = `<p><span>${answers.num_1}</span>*<span>${answers.num_2}</span>=</p>
             <div id="result">${states.initial_state}</div>
-             <input type="number" value="0" id="answer">
+             <input autofocus="autofocus" type="number" value="" id="answer">
              <button id="submit" onclick="solve()">Submit</button>`
 target.innerHTML = guess
 }
@@ -76,24 +76,26 @@ function disable_button(){
     config.no_submit = true
 }
 
-function solve(){
+async function solve(){
     answers.guess = Number(document.querySelector("#answer").value)
     console.log(answers)
     if(answers.guess == answers.correct){
-        document.querySelector("#result").textContent = `${states.right_answer}`
         increase_score()
         update_score(config.score)
         correct_sound.play()
         disable_button()
         console.log("Correct!")
+        states.initial_state = states.right_answer
+        document.querySelector("#result").textContent = `${states.right_answer}`
     }
     else{
-        document.querySelector("#result").textContent = `${states.wrong_answer}`
         decrease_score()
         update_score(config.score)
         wrong_sound.play()
         disable_button()
         console.log("Sorry! Wrong answer")
+        states.initial_state = states.wrong_answer
+        document.querySelector("#result").textContent = `${states.wrong_answer}`
     }
 
 }
@@ -102,15 +104,25 @@ document.addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
       // code for enter
       if(config.no_submit == false){
-        solve()}
+        solve().then(load_question())
+    
+    }
     }
   });
 
-document.addEventListener('keypress', function (e) {
-    if (e.key === 'Space') {
-      // code for enter
-
-        load_question()
+  document.onkeyup = function(e) {
+    if (e.key == " " ||
+        e.code == "Space"    
+   
+    ) {
+        
+      load_question()
+      
     }
-  });
+  }
 
+setInterval(function(){
+    console.log("xx")
+    //focus on input field
+    document.getElementById("answer").focus()
+},500)
