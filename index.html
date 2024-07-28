@@ -1,17 +1,27 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <script type="text/javascript" src="app.js"></script>
-    <link type="text/css" rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Practice Math</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
 </head>
 <body onload="focus()">
-    <button onclick="new_game()">🎱</button>
-    <div id="score">Score: <span id="score">0</span></div>
-    <button onclick="load_question()">Next</button>
-    <div id="problem"></div>
-    <footer>©2022 Marcin Kraszewski</footer>
+    <header>
+        <h1>Practice Math</h1>
+    </header>
+    <main>
+        <div class="controls">
+            <button class="btn" onclick="new_game()">🎱 New Game</button>
+            <div id="score">Score: <span id="score-value">0</span></div>
+            <button class="btn" onclick="load_question()">Next Question</button>
+        </div>
+        <div id="problem" class="problem-container"></div>
+    </main>
+    <footer>
+        <p>©2022 Marcin Kraszewski</p>
+    </footer>
 </body>
 </html>
