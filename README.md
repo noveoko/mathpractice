@@ -52,6 +52,4 @@ A: No, you can play as many times as you want. Each session offers a new set of 
 
 ---
 
-Join the Math Mastery community and start improving your multiplication skills today!
-
 
