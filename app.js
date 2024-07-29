@@ -189,6 +189,8 @@ async function solve() {
     } else {
         decrease_score();
         update_score(config.score);
+        const soundEffect = new Audio('sound.mp3');
+        wrong_sound.volume = 0.25; // Sets volume to 25%
         wrong_sound.play();
         disable_button();
         console.log("Sorry! Wrong answer");
