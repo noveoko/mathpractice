@@ -1,28 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Practice Math</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="app.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Master</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
 </head>
-<body onload="focus()">
+<body>
+  <div class="app-container">
     <header>
-        <h1>Practice Math</h1>
+      <h1>Math Master</h1>
     </header>
     <main>
+      <div class="game-area">
         <div class="controls">
-            <button class="btn" onclick="new_game()">🎱 New Game</button>
-            <div id="score">Score: <span id="score-value">0</span></div>
-            <button class="btn" onclick="load_question()">Next Question</button>
+          <button id="new-game-btn" onclick="new_game()">New Game</button>
+          <div id="score">Score: <span id="score-value">0</span></div>
+          <button id="next-question-btn" onclick="load_question()">Next Question</button>
+          <button id="hyper-focus-btn" onclick="startHyperFocus()" disabled>Hyper Focus</button>
         </div>
-        <div id="problem" class="problem-container"></div>
-        <div id="knowledge-graph"></div>
+        <div id="difficulty-toggle">
+          <button id="easy-mode" class="active" onclick="setDifficulty('easy')">Easy</button>
+          <button id="hard-mode" onclick="setDifficulty('hard')">Hard</button>
+        </div>
+        <div id="problem" class="problem-container">
+          <div id="timer-bar">
+            <div id="timer-progress"></div>
+          </div>
+        </div>
+        <div class="knowledge-graph-container">
+          <h3>Progress Graph</h3>
+          <div id="knowledge-graph"></div>
+        </div>
+      </div>
     </main>
-    <footer>
-        <p>©2022 Marcin Kraszewski</p>
-    </footer>
+  </div>
+  <footer>
+    <p>&copy; 2024 Math Master | Designed by Marcin Kraszewski</p>
+  </footer>
 </body>
 </html>

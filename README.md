@@ -53,3 +53,8 @@ A: No, you can play as many times as you want. Each session offers a new set of 
 ---
 
 
+## Developers
+
+### Run tests
+
+npm install --save-dev jest
