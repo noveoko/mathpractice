@@ -35,7 +35,7 @@ function weighted_random_int() {
 
     let choices = [];
     for (let i = 1; i <= 10; i++) {
-        for (let j = 1; j <= 10; j++) {
+        for (let j = i; j <= 10; j++) {  // Ensure i <= j
             if (!completedProblems.has(`${i}-${j}`)) {
                 let weight = 1 + wrongCount[i - 1][j - 1] - correctCount[i - 1][j - 1];
                 weight = Math.max(weight, 1);
@@ -48,8 +48,8 @@ function weighted_random_int() {
 
     if (choices.length === 0) {
         for (let i = 1; i <= 10; i++) {
-            for (let j = 1; j <= 10; j++) {
-                if (!completedProblems.has(`${i}-${j}`) || completedProblems.size === 100) {
+            for (let j = i; j <= 10; j++) {  // Ensure i <= j
+                if (!completedProblems.has(`${i}-${j}`) || completedProblems.size === 55) {  // 55 unique combinations (1-10) × (1-10)
                     choices.push([i, j]);
                 }
             }
@@ -100,25 +100,27 @@ function increase_score(v = 1) {
 
 function updateGraph(num1, num2, correct, firstTry) {
     let color;
-    let count = correctCount[num1 - 1][num2 - 1];
+    let i = Math.min(num1, num2);
+    let j = Math.max(num1, num2);
+    let count = correctCount[i - 1][j - 1];
 
     if (correct) {
-        correctCount[num1 - 1][num2 - 1]++;
+        correctCount[i - 1][j - 1]++;
         if (count === 0 && firstTry) {
             color = '#FFD700';  // Gold
         } else if (count === 1) {
             color = '#32CD32';  // Lime Green
         } else if (count === 2) {
             color = '#228B22';  // Forest Green
-            completedProblems.add(`${num1}-${num2}`);
+            completedProblems.add(`${i}-${j}`);
         }
     } else {
-        wrongCount[num1 - 1][num2 - 1]++;
+        wrongCount[i - 1][j - 1]++;
         color = '#FF6347';  // Tomato
     }
 
     if (color) {
-        document.getElementById(`cell-${num1}-${num2}`).style.backgroundColor = color;
+        document.getElementById(`cell-${i}-${j}`).style.backgroundColor = color;
     }
 }
 
@@ -217,7 +219,7 @@ document.onkeyup = function (e) {
 function createGraph() {
     let graph = document.getElementById('knowledge-graph');
     for (let i = 1; i <= 10; i++) {
-        for (let j = 1; j <= 10; j++) {
+        for (let j = i; j <= 10; j++) {  // Ensure i <= j
             let cell = document.createElement('div');
             cell.id = `cell-${i}-${j}`;
             cell.classList.add('knowledge-cell');
@@ -230,7 +232,7 @@ function createGraph() {
 function showDifficultProblems() {
     let difficulties = [];
     for (let i = 1; i <= 10; i++) {
-        for (let j = 1; j <= 10; j++) {
+        for (let j = i; j <= 10; j++) {  // Ensure i <= j
             difficulties.push({
                 problem: `${i} × ${j}`,
                 wrongs: wrongCount[i - 1][j - 1]
@@ -245,7 +247,7 @@ function showDifficultProblems() {
 window.addEventListener('beforeunload', showDifficultProblems);
 
 function checkAllProblemsAttempted() {
-    if (attemptedProblems.size === 100 && !allProblemsAttempted) {
+    if (attemptedProblems.size === 55 && !allProblemsAttempted) {
         allProblemsAttempted = true;
         document.getElementById('hyper-focus-btn').disabled = false;
         alert("Congratulations! You've attempted all problems. Hyper Focus mode is now available!");
@@ -269,7 +271,7 @@ function exitHyperFocus() {
 function getHyperFocusProblem() {
     let difficulties = [];
     for (let i = 1; i <= 10; i++) {
-        for (let j = 1; j <= 10; j++) {
+        for (let j = i; j <= 10; j++) {  // Ensure i <= j
             difficulties.push({
                 num1: i,
                 num2: j,
@@ -299,4 +301,3 @@ function updateModeDisplay() {
         document.querySelector("#problem").appendChild(modeDisplay);
     }
 }
-
