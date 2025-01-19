@@ -1,0 +1,250 @@
+1. Adding 2 values
+2. Subtracting 2 values
+3. Multiplying 2 values
+4. Dividing 2 values
+5. Order of operations (PEMDAS/BODMAS)
+6. Basic algebraic expressions
+7. Solving linear equations
+8. Solving quadratic equations
+9. Factoring polynomials
+10. Simplifying rational expressions
+11. Solving systems of linear equations
+12. Graphing linear equations
+13. Graphing quadratic equations
+14. Properties of exponents
+15. Scientific notation
+16. Solving exponential equations
+17. Logarithms and their properties
+18. Solving logarithmic equations
+19. Functions and their graphs
+20. Domain and range of functions
+21. Composite functions
+22. Inverse functions
+23. Polynomial functions
+24. Rational functions
+25. Exponential functions
+26. Logarithmic functions
+27. Trigonometric functions
+28. Inverse trigonometric functions
+29. Trigonometric identities
+30. Solving trigonometric equations
+31. Law of sines
+32. Law of cosines
+33. Vectors and their operations
+34. Dot product of vectors
+35. Cross product of vectors
+36. Matrices and their operations
+37. Determinants of matrices
+38. Inverse of a matrix
+39. Solving systems of linear equations using matrices
+40. Eigenvalues and eigenvectors
+41. Sequences and series
+42. Arithmetic sequences
+43. Geometric sequences
+44. Summation notation
+45. Binomial theorem
+46. Probability basics
+47. Combinations and permutations
+48. Probability distributions
+49. Normal distribution
+50. Central limit theorem
+51. Descriptive statistics
+52. Inferential statistics
+53. Hypothesis testing
+54. Correlation and regression
+55. Limits and continuity
+56. Derivatives and their applications
+57. Product rule for derivatives
+58. Quotient rule for derivatives
+59. Chain rule for derivatives
+60. Implicit differentiation
+61. Related rates
+62. Linear approximation
+63. Maxima and minima
+64. Mean value theorem
+65. Optimization problems
+66. Tangent lines and normal lines
+67. Integrals and their applications
+68. Definite integrals
+69. Indefinite integrals
+70. Fundamental theorem of calculus
+71. Area between curves
+72. Volume of solids of revolution
+73. Average value of a function
+74. Integration by substitution
+75. Integration by parts
+76. Partial fractions
+77. Improper integrals
+78. Numerical integration
+79. Differential equations
+80. Separation of variables
+81. Integrating factors
+82. Linear differential equations
+83. Systems of differential equations
+84. Laplace transforms
+85. Fourier series
+86. Fourier transforms
+87. Wave equation
+88. Heat equation
+89. Partial differential equations
+90. Boundary value problems
+91. Eigenvalue problems
+92. Green's functions
+93. Complex numbers
+94. Operations with complex numbers
+95. Polar form of complex numbers
+96. Euler's formula
+97. Complex exponentials
+98. Complex roots of polynomials
+99. Analytic functions
+100. Cauchy-Riemann equations
+101. Contour integration
+102. Residue theorem
+103. Laurent series
+104. Conformal mapping
+105. Vector calculus
+106. Gradient, divergence, and curl
+107. Line integrals
+108. Surface integrals
+109. Volume integrals
+110. Stokes' theorem
+111. Divergence theorem
+112. Green's theorem
+113. Tensor calculus
+114. Riemannian geometry
+115. Differential forms
+116. Exterior derivatives
+117. de Rham cohomology
+118. Lie groups and Lie algebras
+119. Symplectic geometry
+120. Hamiltonian systems
+121. Lagrangian mechanics
+122. Special relativity
+123. General relativity
+124. Quantum mechanics
+125. Schrödinger equation
+126. Dirac equation
+127. Quantum field theory
+128. Feynman diagrams
+129. Path integrals
+130. Renormalization
+131. Gauge theories
+132. Standard model
+133. String theory
+134. Loop quantum gravity
+135. Topological quantum field theory
+136. Knot theory
+137. Homotopy theory
+138. Homology theory
+139. Cohomology theory
+140. Algebraic topology
+141. Differential topology
+142. Manifolds
+143. Fiber bundles
+144. Characteristic classes
+145. Morse theory
+146. Catastrophe theory
+147. Bifurcation theory
+148. Chaos theory
+149. Fractals
+150. Dynamical systems
+151. Ergodic theory
+152. Information theory
+153. Coding theory
+154. Cryptography
+155. Number theory
+156. Diophantine equations
+157. Modular arithmetic
+158. Quadratic residues
+159. Primality testing
+160. Factorization algorithms
+161. Elliptic curves
+162. Algebraic number theory
+163. Analytic number theory
+164. p-adic numbers
+165. Galois theory
+166. Field extensions
+167. Ring theory
+168. Module theory
+169. Ideal theory
+170. Commutative algebra
+171. Non-commutative algebra
+172. Representation theory
+173. Lie algebras
+174. Group theory
+175. Finite groups
+176. Infinite groups
+177. Topological groups
+178. Homological algebra
+179. Category theory
+180. Functoriality
+181. Natural transformations
+182. Adjoint functors
+183. Limits and colimits
+184. Yoneda lemma
+185. Monads
+186. Comonads
+187. Topos theory
+188. Sheaf theory
+189. Étale cohomology
+190. Motivic cohomology
+191. K-theory
+192. Algebraic K-theory
+193. Topological K-theory
+194. Operator algebras
+195. C*-algebras
+196. Von Neumann algebras
+197. Non-commutative geometry
+198. Quantum groups
+199. Hopf algebras
+200. Braided monoidal categories
+201. Quantum knot invariants
+202. Topological quantum field theory
+203. Conformal field theory
+204. Vertex operator algebras
+205. Modular tensor categories
+206. Fusion categories
+207. Subfactor theory
+208. Planar algebras
+209. Operad theory
+210. Homotopy type theory
+211. Type theory
+212. Lambda calculus
+213. Combinatory logic
+214. Recursion theory
+215. Computability theory
+216. Complexity theory
+217. Algorithmic information theory
+218. Formal languages
+219. Automata theory
+220. Graph theory
+221. Combinatorial optimization
+222. Network flows
+223. Matching theory
+224. Ramsey theory
+225. Extremal combinatorics
+226. Probabilistic combinatorics
+227. Algebraic combinatorics
+228. Enumerative combinatorics
+229. Polyhedral combinatorics
+230. Matroid theory
+231. Order theory
+232. Lattice theory
+233. Boolean algebra
+234. Fuzzy logic
+235. Modal logic
+236. Intuitionistic logic
+237. Paraconsistent logic
+238. Many-valued logic
+239. Linear logic
+240. Categorical logic
+241. Model theory
+242. Proof theory
+243. Set theory
+244. Forcing
+245. Large cardinals
+246. Inner model theory
+247. Descriptive set theory
+248. Recursion theory
+249. Reverse mathematics
+250. Differentiating under the integral sign
