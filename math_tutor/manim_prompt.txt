@@ -1,0 +1,6 @@
+Write Python code using the Manim library to animate the addition of two numbers, say 3 and 5, showing
+... the process step-by-step. The animation should:
+... - Display the two numbers separately.
+... - Show the addition operation between them.
+... - Finally, show the result of the addition. Use Manim animations like `Write`, `Transform`, and `Indica
+... te` to make the process visually clear. Return only the Python code, without comments or explanations.
