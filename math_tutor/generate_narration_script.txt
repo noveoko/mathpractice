@@ -1,0 +1,7 @@
+Given a <code snippet> for a Manim animation, generate a concise and engaging narration script designed for a voice-over. The script should:
+
+Clearly explain the mathematical concept or process being visualized.
+Avoid using mathematical symbols or notation; instead, describe concepts in plain English.
+Follow the flow of the animation, describing each step and its purpose in the simplest terms possible.
+Keep the language conversational and easy to understand for a general audience.
+Return only the narration script, formatted as plain text for use in a voice-over.
