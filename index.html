@@ -6,7 +6,6 @@
   <title>Math Master</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <script src="app.js" defer></script>
 </head>
 <body>
   <div class="app-container">
@@ -16,29 +15,23 @@
     <main>
       <div class="game-area">
         <div class="controls">
-          <button id="new-game-btn" onclick="new_game()">New Game</button>
           <div id="score">Score: <span id="score-value">0</span></div>
-          <button id="next-question-btn" onclick="load_question()">Next Question</button>
-          <button id="hyper-focus-btn" onclick="startHyperFocus()" disabled>Hyper Focus</button>
-        </div>
-        <div id="difficulty-toggle">
-          <button id="easy-mode" class="active" onclick="setDifficulty('easy')">Easy</button>
-          <button id="hard-mode" onclick="setDifficulty('hard')">Hard</button>
+          <div id="streak">Streak: <span id="streak-value">0</span></div>
+          <button id="new-game-btn" onclick="resetGame()">New Game</button>
         </div>
         <div id="problem" class="problem-container">
-          <div id="timer-bar">
-            <div id="timer-progress"></div>
           </div>
-        </div>
-        <div class="knowledge-graph-container">
-          <h3>Progress Graph</h3>
-          <div id="knowledge-graph"></div>
-        </div>
+      </div>
+      <div class="knowledge-graph-container">
+        <h3>Progress Graph</h3>
+        <p>Click a square to practice that specific problem!</p>
+        <div id="knowledge-graph"></div>
       </div>
     </main>
+    <footer>
+      <p>&copy; 2025 Math Master | Dramatically Improved</p>
+    </footer>
   </div>
-  <footer>
-    <p>&copy; 2024 Math Master | Designed by Marcin Kraszewski</p>
-  </footer>
+  <script src="app.js"></script>
 </body>
 </html>
