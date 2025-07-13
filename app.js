@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const state = {
         score: 0,
         streak: 0,
-        currentProblem: { num1: 0, num2: 0, answer: 0 },
+        currentProblem: { num1: 0, num2: 0, answer: 0, displayFormat: 'multiplication' },
         isWaitingForNext: false,
         problemHistory: new Map(), // Key: "n1-n2", Value: { attempts: [], lastPracticed: null, mastery: 'unseen' }
     };
@@ -30,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- INITIALIZATION ---
     function init() {
-        // Initialize problem history for all 55 unique multiplication pairs
         for (let i = 1; i <= 10; i++) {
             for (let j = i; j <= 10; j++) {
                 const key = `${i}-${j}`;
@@ -48,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupEventListeners() {
         newGameBtn.addEventListener('click', resetGame);
-        // Event listener for the whole document to handle key presses
         document.addEventListener('keydown', handleKeyPress);
     }
 
@@ -91,9 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         break;
                     case MASTERY_LEVELS.MASTERED:
                          const correctStreak = getCorrectStreak(data.attempts);
-                         if (correctStreak >= 3) color = '#417505'; // Dark Green
-                         else if (correctStreak === 2) color = '#7ed321'; // Bright Green
-                         else color = '#b8e986'; // Light Green
+                         if (correctStreak >= 3) color = '#417505';
+                         else if (correctStreak === 2) color = '#7ed321';
+                         else color = '#b8e986';
                         break;
                     case MASTERY_LEVELS.UNSEEN:
                     default:
@@ -106,9 +104,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     function renderProblem() {
-        const { num1, num2 } = state.currentProblem;
+        const { num1, num2, displayFormat } = state.currentProblem;
+        let questionHTML = '';
+
+        if (displayFormat === 'repeated-addition') {
+            // Generate addition string: e.g., 2 + 2 + 2
+            const additionString = Array(num2).fill(num1).join(' + ');
+            questionHTML = `<p class="question" style="font-size: 2rem;">${additionString} =</p>`;
+        } else {
+            // Standard multiplication: e.g., 2 x 3
+            questionHTML = `<p class="question"><span>${num1}</span> × <span>${num2}</span> =</p>`;
+        }
+
         problemContainerEl.innerHTML = `
-            <p class="question"><span>${num1}</span> × <span>${num2}</span> =</p>
+            ${questionHTML}
             <div id="result">❔</div>
             <input autofocus type="number" id="answer" class="answer-input">
         `;
@@ -127,13 +136,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const now = Date.now();
         const problems = Array.from(state.problemHistory.entries());
 
-        // Prioritize challenging problems
         const challengingProblems = problems.filter(([, data]) => data.mastery === MASTERY_LEVELS.CHALLENGING);
         if (challengingProblems.length > 0) {
             return challengingProblems[Math.floor(Math.random() * challengingProblems.length)];
         }
 
-        // Add weight based on mastery and how recently the problem was practiced
         const weightedProblems = problems.map(([key, data]) => {
             let weight = 1;
             if (data.mastery === MASTERY_LEVELS.UNSEEN) {
@@ -142,13 +149,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 weight = 5;
             }
 
-            // Increase weight for problems not practiced recently (spaced repetition)
             if (data.lastPracticed) {
                 const hoursSinceLast = (now - data.lastPracticed) / (1000 * 60 * 60);
                 if (hoursSinceLast > 24) weight *= 1.5;
                 if (hoursSinceLast > 72) weight *= 2;
             }
-
             return { key, weight };
         });
 
@@ -158,32 +163,37 @@ document.addEventListener('DOMContentLoaded', () => {
         for (const problem of weightedProblems) {
             random -= problem.weight;
             if (random <= 0) {
-                const [num1, num2] = problem.key.split('-').map(Number);
                 return [problem.key, state.problemHistory.get(problem.key)];
             }
         }
 
-        // Fallback to a random problem
-         const [fallbackKey] = problems[Math.floor(Math.random() * problems.length)];
-         const [num1, num2] = fallbackKey.split('-').map(Number);
-         return [fallbackKey, state.problemHistory.get(fallbackKey)];
+        return problems[Math.floor(Math.random() * problems.length)];
     }
 
     function loadQuestion() {
-        const [key, problemData] = getNextProblem();
-        const [num1, num2] = key.split('-').map(Number);
+        const [key] = getNextProblem();
+        let [num1, num2] = key.split('-').map(Number);
 
-        state.currentProblem = { num1, num2, answer: num1 * num2 };
+        let displayFormat = 'multiplication';
+        // Decide on the problem format
+        const formatRoll = Math.random();
+        if (formatRoll < 0.25 && num2 > 1 && num1 > 1) { // 25% chance for repeated addition
+            displayFormat = 'repeated-addition';
+            // For A + A + ... (B times), num1 is the number, num2 is the count
+            if(Math.random() > 0.5) [num1, num2] = [num2, num1]; // Randomly swap for variation
+        } else if (formatRoll < 0.75) { // 50% chance to swap for commutative property
+            [num1, num2] = [num2, num1];
+        }
+        // The remaining 25% will be the standard n1 x n2
+
+        state.currentProblem = { num1, num2, answer: num1 * num2, displayFormat };
         state.isWaitingForNext = false;
 
         renderProblem();
     }
 
     function practiceSpecificProblem(num1, num2) {
-        const i = Math.min(num1, num2);
-        const j = Math.max(num1, num2);
-
-        state.currentProblem = { num1: i, num2: j, answer: i * j };
+        state.currentProblem = { num1, num2, answer: num1 * num2, displayFormat: 'multiplication' };
         state.isWaitingForNext = false;
         renderProblem();
     }
@@ -208,12 +218,17 @@ document.addEventListener('DOMContentLoaded', () => {
         state.isWaitingForNext = true;
         const guess = Number(document.getElementById('answer').value);
         const resultEl = document.getElementById('result');
-        const { num1, num2, answer } = state.currentProblem;
-        const key = `${Math.min(num1, num2)}-${Math.max(num1, num2)}`;
+
+        // Original numbers for history tracking are stored in currentProblem
+        const n1 = state.currentProblem.num1;
+        const n2 = state.currentProblem.num2;
+        const answer = state.currentProblem.answer;
+
+        // The key for history should always be min-max
+        const key = `${Math.min(n1, n2)}-${Math.max(n1, n2)}`;
         const problemData = state.problemHistory.get(key);
 
         if (guess === answer) {
-            // Correct Answer
             resultEl.textContent = '😄';
             resultEl.style.transform = 'scale(1.5)';
             SOUNDS.correct.play();
@@ -221,7 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
             state.streak++;
             problemData.attempts.push(true);
         } else {
-            // Incorrect Answer
             resultEl.textContent = '⛔';
             resultEl.style.transform = 'scale(1.5)';
             SOUNDS.wrong.play();
@@ -230,14 +244,12 @@ document.addEventListener('DOMContentLoaded', () => {
             problemData.attempts.push(false);
         }
 
-        // Update problem metadata
         problemData.lastPracticed = Date.now();
         updateMastery(problemData);
 
         updateScoreDisplay();
         updateGraph();
 
-        // After a brief moment, reset the result icon and prepare for next question
         setTimeout(() => {
             resultEl.textContent = '...';
             resultEl.style.transform = 'scale(1)';
