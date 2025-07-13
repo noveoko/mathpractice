@@ -1,182 +1,187 @@
 :root {
-    --primary-color: #4A90E2;
-    --secondary-color: #50E3C2;
-    --background-color: #F4F7F9;
-    --text-color: #333333;
-    --accent-color: #FF6B6B;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  --primary-bg: #f0f4f8;
+  --secondary-bg: #ffffff;
+  --text-color: #333333;
+  --primary-accent: #4a90e2;
+  --correct-color: #7ed321;
+  --incorrect-color: #d0021b;
+  --mastered-color-1: #b8e986;
+  --mastered-color-2: #7ed321;
+  --mastered-color-3: #417505;
+  --unseen-color: #d8d8d8;
+  --font-family: 'Roboto', sans-serif;
+  --border-radius: 12px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    line-height: 1.6;
+  font-family: var(--font-family);
+  background-color: var(--primary-bg);
+  color: var(--text-color);
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
 
 .app-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+  width: 100%;
+  max-width: 600px;
+  padding: 2rem;
+  box-sizing: border-box;
 }
 
 header {
-    text-align: center;
-    margin-bottom: 30px;
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
-header h1 {
-    color: var(--primary-color);
-    font-size: 2.5rem;
-}
-
-main {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+h1 {
+  font-weight: 700;
+  font-size: 2.5rem;
+  color: var(--primary-accent);
 }
 
 .game-area {
-    flex: 1;
-    margin-right: 30px;
+  background: var(--secondary-bg);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: 2rem;
 }
 
 .controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
 }
 
-button {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+#score, #streak {
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-bg);
+  border-radius: var(--border-radius);
 }
 
-button:hover {
-    background-color: var(--secondary-color);
+#new-game-btn {
+  background-color: var(--incorrect-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-#score {
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-
-#difficulty-toggle {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-#difficulty-toggle button {
-    margin: 0 10px;
-}
-
-#difficulty-toggle button.active {
-    background-color: var(--secondary-color);
+#new-game-btn:hover {
+  background-color: #a00115;
 }
 
 .problem-container {
-    background-color: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background-color: var(--primary-bg);
+  border-radius: var(--border-radius);
 }
 
-#timer-bar {
-    width: 100%;
-    height: 10px;
-    background-color: #e0e0e0;
-    border-radius: 5px;
-    overflow: hidden;
-    margin-top: 20px;
+.question {
+  font-size: 3rem;
+  font-weight: 300;
+  margin: 0 0 1.5rem 0;
 }
 
-#timer-progress {
-    height: 100%;
-    background-color: var(--accent-color);
-    width: 100%;
-    transition: width 3s linear;
+.question span {
+  font-weight: 700;
+}
+
+#result {
+  font-size: 3rem;
+  height: 60px;
+  line-height: 60px;
+  margin-bottom: 1.5rem;
+  transition: transform 0.2s;
+}
+
+.answer-input {
+  width: 100px;
+  height: 80px;
+  font-size: 3rem;
+  text-align: center;
+  border: 2px solid var(--primary-accent);
+  border-radius: var(--border-radius);
+  background-color: var(--secondary-bg);
+  color: var(--primary-accent);
+  outline: none;
+  transition: all 0.3s;
+}
+
+.answer-input:focus {
+  box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.3);
+}
+
+.submit-btn {
+  display: none; /* We'll rely on the Enter key */
 }
 
 .knowledge-graph-container {
-    margin-top: 20px;
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: var(--secondary-bg);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  text-align: center;
 }
 
-.knowledge-graph-container h3 {
-    text-align: center;
-    margin-bottom: 15px;
-    color: var(--primary-color);
+h3 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
 }
 
 #knowledge-graph {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: 2px;
-    width: 100%;
-    max-width: 300px;
-    aspect-ratio: 1 / 1;
-    margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 8px;
 }
 
 .knowledge-cell {
-    width: 100%;
-    height: 100%;
-    border: 1px solid #ccc;
-    background-color: #fff;
+  width: 100%;
+  padding-bottom: 100%; /* Maintain aspect ratio */
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
 }
 
-#hyper-focus-btn {
-    background-color: var(--accent-color);
+.knowledge-cell:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.knowledge-cell-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     color: white;
-    transition: background-color 0.3s ease, opacity 0.3s ease;
+    font-size: 0.8rem;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s;
 }
 
-#hyper-focus-btn:hover:not(:disabled) {
-    background-color: #ff4f4f;
-}
-
-#hyper-focus-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+.knowledge-cell:hover .knowledge-cell-text {
+    opacity: 1;
 }
 
 footer {
-    text-align: center;
-    margin-top: 50px;
-    color: #777;
-}
-
-@media (max-width: 768px) {
-    main {
-        flex-direction: column;
-    }
-
-    .game-area {
-        margin-right: 0;
-        margin-bottom: 30px;
-    }
-
-    .knowledge-graph-container {
-        width: 100%;
-    }
-
-    #knowledge-graph {
-        max-width: 100%;
-    }
+  text-align: center;
+  margin-top: 2rem;
+  color: #888;
 }
