@@ -1,303 +1,295 @@
-const answers = { num_1: 0, num_2: 0, guess: 0, correct: 0 };
-const config = { max: 10, score: 0, no_submit: false, difficulty: 'easy' };
-const states = { right_answer: '😄', wrong_answer: '⛔', initial_state: '❔' };
-const history = {};
-const last_answer = { previous: [] };
-const stats = Array.from({ length: 10 }, () => Array(10).fill(0));
-const wrongCount = Array.from({ length: 10 }, () => Array(10).fill(0));
-const correctCount = Array.from({ length: 10 }, () => Array(10).fill(0));
-let attemptedProblems = new Set();
-let completedProblems = new Set();
-let timer;
-let timerProgress;
-let allProblemsAttempted = false;
-let hyperFocusMode = false;
+document.addEventListener('DOMContentLoaded', () => {
+    // --- STATE MANAGEMENT ---
+    const state = {
+        score: 0,
+        streak: 0,
+        currentProblem: { num1: 0, num2: 0, answer: 0 },
+        isWaitingForNext: false,
+        problemHistory: new Map(), // Key: "n1-n2", Value: { attempts: [], lastPracticed: null, mastery: 'unseen' }
+    };
 
-window.addEventListener('load', (event) => {
-    console.log('Math Game Start');
-    load_question();
-    createGraph();
-    setDifficulty(config.difficulty);
-});
+    const MASTERY_LEVELS = {
+        UNSEEN: 'unseen',
+        LEARNING: 'learning',
+        MASTERED: 'mastered',
+        CHALLENGING: 'challenging',
+    };
 
-const correct_sound = new Audio('sounds/correct_answer/success.mp3');
-const wrong_sound = new Audio('sounds/wrong_answer/Wrong-answer-sound-effect.mp3');
-const start_sound = new Audio('sounds/game_start/game-start-6104.mp3');
+    const SOUNDS = {
+        correct: new Audio('sounds/correct_answer/success.mp3'),
+        wrong: new Audio('sounds/wrong_answer/Wrong-answer-sound-effect.mp3'),
+    };
 
-function random_int() {
-    return Math.ceil(Math.random() * config.max);
-}
+    // --- DOM ELEMENTS ---
+    const scoreValueEl = document.getElementById('score-value');
+    const streakValueEl = document.getElementById('streak-value');
+    const problemContainerEl = document.getElementById('problem');
+    const knowledgeGraphEl = document.getElementById('knowledge-graph');
+    const newGameBtn = document.getElementById('new-game-btn');
 
-function weighted_random_int() {
-    if (hyperFocusMode) {
-        return getHyperFocusProblem();
-    }
 
-    let choices = [];
-    for (let i = 1; i <= 10; i++) {
-        for (let j = i; j <= 10; j++) {  // Ensure i <= j
-            if (!completedProblems.has(`${i}-${j}`)) {
-                let weight = 1 + wrongCount[i - 1][j - 1] - correctCount[i - 1][j - 1];
-                weight = Math.max(weight, 1);
-                for (let k = 0; k < weight; k++) {
-                    choices.push([i, j]);
-                }
-            }
-        }
-    }
-
-    if (choices.length === 0) {
+    // --- INITIALIZATION ---
+    function init() {
+        // Initialize problem history for all 55 unique multiplication pairs
         for (let i = 1; i <= 10; i++) {
-            for (let j = i; j <= 10; j++) {  // Ensure i <= j
-                if (!completedProblems.has(`${i}-${j}`) || completedProblems.size === 55) {  // 55 unique combinations (1-10) × (1-10)
-                    choices.push([i, j]);
+            for (let j = i; j <= 10; j++) {
+                const key = `${i}-${j}`;
+                state.problemHistory.set(key, {
+                    attempts: [],
+                    lastPracticed: null,
+                    mastery: MASTERY_LEVELS.UNSEEN,
+                });
+            }
+        }
+        createGraph();
+        loadQuestion();
+        setupEventListeners();
+    }
+
+    function setupEventListeners() {
+        newGameBtn.addEventListener('click', resetGame);
+        // Event listener for the whole document to handle key presses
+        document.addEventListener('keydown', handleKeyPress);
+    }
+
+
+    // --- UI & RENDERING ---
+    function createGraph() {
+        knowledgeGraphEl.innerHTML = '';
+        for (let i = 1; i <= 10; i++) {
+            for (let j = i; j <= 10; j++) {
+                const key = `${i}-${j}`;
+                const cell = document.createElement('div');
+                cell.id = `cell-${key}`;
+                cell.classList.add('knowledge-cell');
+                cell.title = `${i} × ${j}`;
+                cell.dataset.key = key;
+
+                const cellText = document.createElement('span');
+                cellText.classList.add('knowledge-cell-text');
+                cellText.textContent = `${i}×${j}`;
+                cell.appendChild(cellText);
+
+                cell.addEventListener('click', () => practiceSpecificProblem(i, j));
+                knowledgeGraphEl.appendChild(cell);
+            }
+        }
+        updateGraph();
+    }
+
+    function updateGraph() {
+        for (const [key, data] of state.problemHistory.entries()) {
+            const cell = document.getElementById(`cell-${key}`);
+            if (cell) {
+                let color;
+                switch (data.mastery) {
+                    case MASTERY_LEVELS.LEARNING:
+                        color = 'var(--primary-accent)';
+                        break;
+                    case MASTERY_LEVELS.CHALLENGING:
+                        color = 'var(--incorrect-color)';
+                        break;
+                    case MASTERY_LEVELS.MASTERED:
+                         const correctStreak = getCorrectStreak(data.attempts);
+                         if (correctStreak >= 3) color = '#417505'; // Dark Green
+                         else if (correctStreak === 2) color = '#7ed321'; // Bright Green
+                         else color = '#b8e986'; // Light Green
+                        break;
+                    case MASTERY_LEVELS.UNSEEN:
+                    default:
+                        color = 'var(--unseen-color)';
                 }
+                cell.style.backgroundColor = color;
             }
         }
     }
 
-    let choice = choices[Math.floor(Math.random() * choices.length)];
-    return choice;
-}
 
-function answer_set() {
-    let [number_1, number_2] = weighted_random_int();
-    answers.num_1 = number_1;
-    answers.num_2 = number_2;
-    answers.correct = number_1 * number_2;
-    last_answer.previous = [number_1, number_2];
-    attemptedProblems.add(`${number_1}-${number_2}`);
-    checkAllProblemsAttempted();
-}
-
-async function reset_game() {
-    if (confirm('Reset game? Warning: Score will be lost!')) {
-        console.log("Game reset!");
-        window.location.reload();
-    } else {
-        console.log("No action taken");
+    function renderProblem() {
+        const { num1, num2 } = state.currentProblem;
+        problemContainerEl.innerHTML = `
+            <p class="question"><span>${num1}</span> × <span>${num2}</span> =</p>
+            <div id="result">❔</div>
+            <input autofocus type="number" id="answer" class="answer-input">
+        `;
+        document.getElementById('answer').focus();
     }
-}
 
-function new_game() {
-    reset_game().then(() => {
-        console.log("Answer field in focus");
-        document.querySelector("#answer").focus();
-    });
-}
+    function updateScoreDisplay() {
+        scoreValueEl.textContent = state.score;
+        streakValueEl.textContent = state.streak;
+    }
 
-function update_score(points) {
-    document.querySelector("#score-value").textContent = `${points}`;
-}
 
-function decrease_score(v = 1) {
-    config.score -= v;
-}
+    // --- GAME LOGIC ---
 
-function increase_score(v = 1) {
-    config.score += v;
-}
+    function getNextProblem() {
+        const now = Date.now();
+        const problems = Array.from(state.problemHistory.entries());
 
-function updateGraph(num1, num2, correct, firstTry) {
-    let color;
-    let i = Math.min(num1, num2);
-    let j = Math.max(num1, num2);
-    let count = correctCount[i - 1][j - 1];
-
-    if (correct) {
-        correctCount[i - 1][j - 1]++;
-        if (count === 0 && firstTry) {
-            color = '#FFD700';  // Gold
-        } else if (count === 1) {
-            color = '#32CD32';  // Lime Green
-        } else if (count === 2) {
-            color = '#228B22';  // Forest Green
-            completedProblems.add(`${i}-${j}`);
+        // Prioritize challenging problems
+        const challengingProblems = problems.filter(([, data]) => data.mastery === MASTERY_LEVELS.CHALLENGING);
+        if (challengingProblems.length > 0) {
+            return challengingProblems[Math.floor(Math.random() * challengingProblems.length)];
         }
-    } else {
-        wrongCount[i - 1][j - 1]++;
-        color = '#FF6347';  // Tomato
+
+        // Add weight based on mastery and how recently the problem was practiced
+        const weightedProblems = problems.map(([key, data]) => {
+            let weight = 1;
+            if (data.mastery === MASTERY_LEVELS.UNSEEN) {
+                weight = 10;
+            } else if (data.mastery === MASTERY_LEVELS.LEARNING) {
+                weight = 5;
+            }
+
+            // Increase weight for problems not practiced recently (spaced repetition)
+            if (data.lastPracticed) {
+                const hoursSinceLast = (now - data.lastPracticed) / (1000 * 60 * 60);
+                if (hoursSinceLast > 24) weight *= 1.5;
+                if (hoursSinceLast > 72) weight *= 2;
+            }
+
+            return { key, weight };
+        });
+
+        const totalWeight = weightedProblems.reduce((sum, p) => sum + p.weight, 0);
+        let random = Math.random() * totalWeight;
+
+        for (const problem of weightedProblems) {
+            random -= problem.weight;
+            if (random <= 0) {
+                const [num1, num2] = problem.key.split('-').map(Number);
+                return [problem.key, state.problemHistory.get(problem.key)];
+            }
+        }
+
+        // Fallback to a random problem
+         const [fallbackKey] = problems[Math.floor(Math.random() * problems.length)];
+         const [num1, num2] = fallbackKey.split('-').map(Number);
+         return [fallbackKey, state.problemHistory.get(fallbackKey)];
     }
 
-    if (color) {
-        document.getElementById(`cell-${i}-${j}`).style.backgroundColor = color;
-    }
-}
+    function loadQuestion() {
+        const [key, problemData] = getNextProblem();
+        const [num1, num2] = key.split('-').map(Number);
 
-function startTimer() {
-    if (config.difficulty === 'hard') {
-        clearTimeout(timer);
-        timerProgress.style.width = '100%';
+        state.currentProblem = { num1, num2, answer: num1 * num2 };
+        state.isWaitingForNext = false;
+
+        renderProblem();
+    }
+
+    function practiceSpecificProblem(num1, num2) {
+        const i = Math.min(num1, num2);
+        const j = Math.max(num1, num2);
+
+        state.currentProblem = { num1: i, num2: j, answer: i * j };
+        state.isWaitingForNext = false;
+        renderProblem();
+    }
+
+
+    function handleKeyPress(e) {
+        if (e.key === 'Enter' && !state.isWaitingForNext) {
+            const answerInput = document.getElementById('answer');
+            if (document.activeElement === answerInput && answerInput.value !== '') {
+                checkAnswer();
+            }
+        } else if (e.key === ' ' || e.code === 'Space') {
+            if (state.isWaitingForNext) {
+                e.preventDefault();
+                loadQuestion();
+            }
+        }
+    }
+
+
+    function checkAnswer() {
+        state.isWaitingForNext = true;
+        const guess = Number(document.getElementById('answer').value);
+        const resultEl = document.getElementById('result');
+        const { num1, num2, answer } = state.currentProblem;
+        const key = `${Math.min(num1, num2)}-${Math.max(num1, num2)}`;
+        const problemData = state.problemHistory.get(key);
+
+        if (guess === answer) {
+            // Correct Answer
+            resultEl.textContent = '😄';
+            resultEl.style.transform = 'scale(1.5)';
+            SOUNDS.correct.play();
+            state.score++;
+            state.streak++;
+            problemData.attempts.push(true);
+        } else {
+            // Incorrect Answer
+            resultEl.textContent = '⛔';
+            resultEl.style.transform = 'scale(1.5)';
+            SOUNDS.wrong.play();
+            if (state.score > 0) state.score--;
+            state.streak = 0;
+            problemData.attempts.push(false);
+        }
+
+        // Update problem metadata
+        problemData.lastPracticed = Date.now();
+        updateMastery(problemData);
+
+        updateScoreDisplay();
+        updateGraph();
+
+        // After a brief moment, reset the result icon and prepare for next question
         setTimeout(() => {
-            timerProgress.style.width = '0%';
-        }, 10);
-        timer = setTimeout(() => {
-            console.log("Time's up!");
-            solve();
-        }, 3000);
+            resultEl.textContent = '...';
+            resultEl.style.transform = 'scale(1)';
+        }, 1000);
     }
-}
 
-function setDifficulty(difficulty) {
-    config.difficulty = difficulty;
-    document.getElementById('easy-mode').classList.toggle('active', difficulty === 'easy');
-    document.getElementById('hard-mode').classList.toggle('active', difficulty === 'hard');
-    if (difficulty === 'easy') {
-        clearTimeout(timer);
-        timerProgress.style.width = '100%';
-    } else {
-        startTimer();
-    }
-}
 
-async function load_question() {
-    config.no_submit = false;
-    console.log("Next question...");
-    let target = document.querySelector("#problem");
-    update_score(config.score);
-    answer_set();
-    let guess = `
-        <p class="question"><span>${answers.num_1}</span> × <span>${answers.num_2}</span> =</p>
-        <div id="result">${states.initial_state}</div>
-        <input autofocus type="number" id="answer" class="answer-input">
-        <button id="submit" class="submit-btn" onclick="solve()">Submit</button>
-    `;
-    target.innerHTML = guess;
-    timerProgress = document.querySelector("#timer-progress");
-    startTimer();
-    document.querySelector("#answer").focus();
-    updateModeDisplay();
-}
+    function updateMastery(data) {
+        const totalAttempts = data.attempts.length;
+        const recentAttempts = data.attempts.slice(-3);
+        const correctStreak = getCorrectStreak(data.attempts);
 
-function disable_button() {
-    document.querySelector("#submit").disabled = true;
-    config.no_submit = true;
-}
+        if (totalAttempts === 0) {
+            data.mastery = MASTERY_LEVELS.UNSEEN;
+            return;
+        }
 
-async function solve() {
-    answers.guess = Number(document.querySelector("#answer").value);
-    console.log(answers);
-    clearTimeout(timer);
-    if (answers.guess == answers.correct) {
-        increase_score();
-        update_score(config.score);
-        correct_sound.play();
-        disable_button();
-        console.log("Correct!");
-        states.initial_state = states.right_answer;
-        document.querySelector("#result").textContent = `${states.right_answer}`;
-        let firstTry = wrongCount[answers.num_1 - 1][answers.num_2 - 1] === 0;
-        updateGraph(answers.num_1, answers.num_2, true, firstTry);
-    } else {
-        decrease_score();
-        update_score(config.score);
-        const soundEffect = new Audio('sound.mp3');
-        wrong_sound.volume = 0.25; // Sets volume to 25%
-        wrong_sound.play();
-        disable_button();
-        console.log("Sorry! Wrong answer");
-        states.initial_state = states.wrong_answer;
-        document.querySelector("#result").textContent = `${states.wrong_answer}`;
-        updateGraph(answers.num_1, answers.num_2, false, false);
-    }
-}
+        const wrongCount = recentAttempts.filter(a => !a).length;
 
-document.addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        if (config.no_submit == false) {
-            solve().then(load_question);
+        if (wrongCount >= 2) {
+            data.mastery = MASTERY_LEVELS.CHALLENGING;
+        } else if (correctStreak >= 3) {
+            data.mastery = MASTERY_LEVELS.MASTERED;
+        } else {
+            data.mastery = MASTERY_LEVELS.LEARNING;
         }
     }
+
+
+    function getCorrectStreak(attempts) {
+        let streak = 0;
+        for (let i = attempts.length - 1; i >= 0; i--) {
+            if (attempts[i]) {
+                streak++;
+            } else {
+                break;
+            }
+        }
+        return streak;
+    }
+
+
+    function resetGame() {
+        if (confirm('Are you sure you want to start a new game? Your progress will be lost.')) {
+            state.score = 0;
+            state.streak = 0;
+            state.problemHistory.clear();
+            init();
+            updateScoreDisplay();
+        }
+    }
+
+    // --- START THE APP ---
+    init();
 });
-
-document.onkeyup = function (e) {
-    if (e.key == " " || e.code == "Space") {
-        load_question();
-    }
-}
-
-function createGraph() {
-    let graph = document.getElementById('knowledge-graph');
-    for (let i = 1; i <= 10; i++) {
-        for (let j = i; j <= 10; j++) {  // Ensure i <= j
-            let cell = document.createElement('div');
-            cell.id = `cell-${i}-${j}`;
-            cell.classList.add('knowledge-cell');
-            cell.title = `${i} × ${j}`;
-            graph.appendChild(cell);
-        }
-    }
-}
-
-function showDifficultProblems() {
-    let difficulties = [];
-    for (let i = 1; i <= 10; i++) {
-        for (let j = i; j <= 10; j++) {  // Ensure i <= j
-            difficulties.push({
-                problem: `${i} × ${j}`,
-                wrongs: wrongCount[i - 1][j - 1]
-            });
-        }
-    }
-    difficulties.sort((a, b) => b.wrongs - a.wrongs);
-    let topDifficulties = difficulties.slice(0, 10);
-    alert("Top 10 most difficult problems: \n" + topDifficulties.map(d => `${d.problem}: ${d.wrongs} wrong answers`).join("\n"));
-}
-
-window.addEventListener('beforeunload', showDifficultProblems);
-
-function checkAllProblemsAttempted() {
-    if (attemptedProblems.size === 55 && !allProblemsAttempted) {
-        allProblemsAttempted = true;
-        document.getElementById('hyper-focus-btn').disabled = false;
-        alert("Congratulations! You've attempted all problems. Hyper Focus mode is now available!");
-    }
-}
-
-function startHyperFocus() {
-    hyperFocusMode = true;
-    document.getElementById('hyper-focus-btn').textContent = 'Exit Hyper Focus';
-    document.getElementById('hyper-focus-btn').onclick = exitHyperFocus;
-    load_question();
-}
-
-function exitHyperFocus() {
-    hyperFocusMode = false;
-    document.getElementById('hyper-focus-btn').textContent = 'Hyper Focus';
-    document.getElementById('hyper-focus-btn').onclick = startHyperFocus;
-    load_question();
-}
-
-function getHyperFocusProblem() {
-    let difficulties = [];
-    for (let i = 1; i <= 10; i++) {
-        for (let j = i; j <= 10; j++) {  // Ensure i <= j
-            difficulties.push({
-                num1: i,
-                num2: j,
-                difficulty: wrongCount[i - 1][j - 1] - correctCount[i - 1][j - 1]
-            });
-        }
-    }
-    difficulties.sort((a, b) => b.difficulty - a.difficulty);
-    let topDifficulties = difficulties.slice(0, 10);
-    let selectedProblem = topDifficulties[Math.floor(Math.random() * topDifficulties.length)];
-    return [selectedProblem.num1, selectedProblem.num2];
-}
-
-function updateModeDisplay() {
-    let modeDisplay = document.createElement('div');
-    modeDisplay.id = 'mode-display';
-    modeDisplay.textContent = hyperFocusMode ? 'Hyper Focus Mode' : 'Normal Mode';
-    modeDisplay.style.textAlign = 'center';
-    modeDisplay.style.marginTop = '10px';
-    modeDisplay.style.fontWeight = 'bold';
-    modeDisplay.style.color = hyperFocusMode ? 'var(--accent-color)' : 'var(--primary-color)';
-    
-    let existingModeDisplay = document.getElementById('mode-display');
-    if (existingModeDisplay) {
-        existingModeDisplay.replaceWith(modeDisplay);
-    } else {
-        document.querySelector("#problem").appendChild(modeDisplay);
-    }
-}
